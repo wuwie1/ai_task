@@ -22,7 +22,7 @@ type DBStorage struct {
 	enableFileSync bool // 是否同步到文件
 }
 
-// NewDBStorage 创建数据库存储
+// 创建数据库存储
 func NewDBStorage(f factory.Factory, filePath string, enableFileSync bool) (*DBStorage, error) {
 	var fileStorage *FileStorage
 	if enableFileSync && filePath != "" {

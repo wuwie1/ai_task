@@ -42,7 +42,7 @@ func WithRepositoryFactory(f factory.Factory) ManagerOption {
 	}
 }
 
-// NewManager 创建任务管理器
+// 创建任务管理器
 func NewManager(config *TaskManagerConfig, opts ...ManagerOption) (*Manager, error) {
 	if config == nil {
 		config = DefaultTaskManagerConfig()
