@@ -1,7 +1,7 @@
 package xormimplement
 
 import (
-	"ai_web/test/model"
+	"ai_task/model"
 	"strings"
 
 	"xorm.io/xorm"
@@ -24,6 +24,7 @@ func WithDefaultOrderField(field string) func(*pagerOrderCondition) {
 	}
 }
 
+// nolint
 func pagerOrder(session xorm.Interface, condition PaginationOrderCondition, arr ...func(*pagerOrderCondition)) {
 	pagerOrderCon := &pagerOrderCondition{}
 	for _, f := range arr {

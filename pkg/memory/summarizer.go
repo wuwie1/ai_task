@@ -1,8 +1,8 @@
 package memory
 
 import (
-	"ai_web/test/constant"
-	"ai_web/test/pkg/clients/llm_model"
+	"ai_task/constant"
+	"ai_task/pkg/clients/llm_model"
 	"context"
 	"encoding/json"
 	"fmt"

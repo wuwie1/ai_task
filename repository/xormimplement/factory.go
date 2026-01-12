@@ -1,10 +1,10 @@
 package xormimplement
 
 import (
-	"ai_web/test/config"
-	"ai_web/test/repository"
-	"ai_web/test/repository/factory"
-	"ai_web/test/repository/interfaces"
+	"ai_task/config"
+	"ai_task/repository"
+	"ai_task/repository/factory"
+	"ai_task/repository/interfaces"
 	"context"
 	"fmt"
 	"sync"
@@ -65,14 +65,6 @@ func openDB(dbType string, host string, port string, userName string, name strin
 // 创建一个会话
 func (f *Factory) NewSession(ctx context.Context) interfaces.Session {
 	return &Session{Session: f.engine.NewSession().Context(ctx)}
-}
-
-// NewChatMemoryChunksRepository 创建聊天记忆仓库
-func (f *Factory) NewChatMemoryChunksRepository(session interfaces.Session) (repository.ChatMemoryChunksRepository, error) {
-	if s, ok := session.(*Session); ok {
-		return NewChatMemoryChunksRepository(s), nil
-	}
-	return nil, fmt.Errorf("xorm session 结构解析失败")
 }
 
 // NewUserProfileRepository 创建用户画像仓库

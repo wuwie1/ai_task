@@ -1,0 +1,10 @@
+/mind
+/vendor/**
+.DS_Store
+*.tar
+dump.rdb
+tmp/
+.vscode
+images/
+.idea/
+bin/

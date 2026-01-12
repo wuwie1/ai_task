@@ -43,6 +43,7 @@ func (s *BaseLLMClientTest) SetupTest() {
 	s.testParams = getTestParams()
 }
 
+// nolint
 // createTestContext 创建测试用的 gin.Context
 func createTestContext() *gin.Context {
 	gin.SetMode(gin.TestMode)

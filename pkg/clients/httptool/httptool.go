@@ -1,8 +1,8 @@
 package httptool
 
 import (
-	"ai_web/test/config"
-	"ai_web/test/pkg/tools"
+	"ai_task/config"
+	"ai_task/pkg/tools"
 	"bytes"
 	"context"
 	"encoding/json"

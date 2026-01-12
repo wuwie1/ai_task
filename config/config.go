@@ -2,8 +2,8 @@
 package config
 
 import (
-	"ai_web/test/constant"
-	"ai_web/test/pkg/file"
+	"ai_task/constant"
+	"ai_task/pkg/file"
 	"fmt"
 	"os"
 	"strings"

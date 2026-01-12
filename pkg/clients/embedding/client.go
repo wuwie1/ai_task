@@ -1,7 +1,7 @@
 package embedding
 
 import (
-	"ai_web/test/config"
+	"ai_task/config"
 	"context"
 	"fmt"
 	"math"

@@ -1,7 +1,7 @@
 package llm_model
 
 import (
-	"ai_web/test/config"
+	"ai_task/config"
 	"context"
 	"net/http"
 	"net/http/httptest"

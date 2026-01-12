@@ -1,4 +1,4 @@
-module ai_web/test
+module ai_task
 
 go 1.25.0
 

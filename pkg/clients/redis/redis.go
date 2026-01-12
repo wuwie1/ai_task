@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"ai_web/test/config"
+	"ai_task/config"
 	"context"
 	"github.com/go-redis/redis/v8"
 	"log"

@@ -1,7 +1,7 @@
 package router
 
 import (
-	"ai_web/test/controller"
+	"ai_task/controller"
 
 	"github.com/gin-gonic/gin"
 )

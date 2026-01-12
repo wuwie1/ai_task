@@ -1,9 +1,9 @@
 package xormimplement
 
 import (
-	"ai_web/test/entity"
-	"ai_web/test/model"
-	"ai_web/test/repository"
+	"ai_task/entity"
+	"ai_task/model"
+	"ai_task/repository"
 	"fmt"
 	"time"
 
@@ -64,7 +64,7 @@ func (r *UserProfileRepository) Upsert(req *model.UpsertUserProfileCondition) er
 		_, err = r.session.Table(entity.TableNameUserProfile).
 			Where(builder.Eq{
 				entity.UserProfileFieldUserID: req.UserID,
-				entity.UserProfileFieldKey:     req.Key,
+				entity.UserProfileFieldKey:    req.Key,
 			}).
 			Update(updateData)
 		if err != nil {
@@ -164,4 +164,3 @@ func (r *UserProfileRepository) Delete(userID, key string) error {
 
 	return nil
 }
-

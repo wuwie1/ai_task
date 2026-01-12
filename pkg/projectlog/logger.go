@@ -1,7 +1,7 @@
 package projectlog
 
 import (
-	"ai_web/test/config"
+	"ai_task/config"
 	"github.com/sirupsen/logrus"
 	"os"
 )

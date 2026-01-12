@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"ai_web/test/model"
-	"ai_web/test/service/factory"
+	"ai_task/model"
+	"ai_task/service/factory"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

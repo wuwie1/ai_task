@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"ai_web/test/entity"
-	"ai_web/test/model"
+	"ai_task/entity"
+	"ai_task/model"
 )
 
 type UserProfileRepository interface {
@@ -11,4 +11,3 @@ type UserProfileRepository interface {
 	List(condition *model.GetUserProfileCondition) ([]*entity.UserProfile, error)
 	Delete(userID, key string) error
 }
-

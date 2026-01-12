@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ai_web/test/config"
-	"ai_web/test/pkg/projectlog"
-	"ai_web/test/router"
+	"ai_task/config"
+	"ai_task/pkg/projectlog"
+	"ai_task/router"
 	"fmt"
 	"log"
 	"net/http"

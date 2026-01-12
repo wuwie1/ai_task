@@ -1,7 +1,7 @@
 package service
 
 import (
-	"ai_web/test/repository/factory"
+	"ai_task/repository/factory"
 )
 
 // nolint
