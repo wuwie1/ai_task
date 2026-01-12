@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"ai_task/repository/factory"
+
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -26,15 +28,56 @@ type Manager struct {
 	viewActionCount map[string]int          // 视图动作计数（用于2动作规则）
 }
 
+// ManagerOption 管理器选项
+type ManagerOption func(*managerOptions)
+
+type managerOptions struct {
+	repoFactory factory.Factory
+}
+
+// WithRepositoryFactory 设置仓库工厂
+func WithRepositoryFactory(f factory.Factory) ManagerOption {
+	return func(opts *managerOptions) {
+		opts.repoFactory = f
+	}
+}
+
 // NewManager 创建任务管理器
-func NewManager(config *TaskManagerConfig) (*Manager, error) {
+func NewManager(config *TaskManagerConfig, opts ...ManagerOption) (*Manager, error) {
 	if config == nil {
 		config = DefaultTaskManagerConfig()
 	}
 
-	storage, err := NewFileStorage(config.StoragePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create storage: %w", err)
+	// 处理选项
+	options := &managerOptions{}
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	// 根据存储类型创建存储
+	var storage Storage
+	var err error
+
+	switch config.StorageType {
+	case StorageTypeDB, StorageTypeHybrid:
+		if options.repoFactory == nil {
+			return nil, fmt.Errorf("repository factory is required for storage type: %s", config.StorageType)
+		}
+		enableFileSync := config.StorageType == StorageTypeHybrid || config.EnableFileSync
+		storage, err = NewDBStorage(options.repoFactory, config.StoragePath, enableFileSync)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create db storage: %w", err)
+		}
+		log.Infof("Task manager using %s storage (file sync: %v)", config.StorageType, enableFileSync)
+
+	case StorageTypeFile:
+		fallthrough
+	default:
+		storage, err = NewFileStorage(config.StoragePath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create file storage: %w", err)
+		}
+		log.Info("Task manager using file storage")
 	}
 
 	return &Manager{

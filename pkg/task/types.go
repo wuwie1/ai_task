@@ -8,28 +8,40 @@
 package task
 
 import (
+	"ai_task/constant"
 	"time"
 )
 
-// TaskStatus 任务状态
-type TaskStatus string
-
-const (
-	TaskStatusPending    TaskStatus = "pending"     // 待处理
-	TaskStatusInProgress TaskStatus = "in_progress" // 进行中
-	TaskStatusCompleted  TaskStatus = "completed"   // 已完成
-	TaskStatusFailed     TaskStatus = "failed"      // 失败
-	TaskStatusCancelled  TaskStatus = "cancelled"   // 已取消
+// 类型别名，方便包内使用
+type (
+	TaskStatus  = constant.TaskStatus
+	PhaseStatus = constant.PhaseStatus
+	StorageType = constant.StorageType
+	ActionType  = constant.ActionType
 )
 
-// PhaseStatus 阶段状态
-type PhaseStatus string
-
+// 常量别名，保持向后兼容
 const (
-	PhaseStatusPending    PhaseStatus = "pending"
-	PhaseStatusInProgress PhaseStatus = "in_progress"
-	PhaseStatusComplete   PhaseStatus = "complete"
-	PhaseStatusFailed     PhaseStatus = "failed"
+	TaskStatusPending    = constant.TaskStatusPending
+	TaskStatusInProgress = constant.TaskStatusInProgress
+	TaskStatusCompleted  = constant.TaskStatusCompleted
+	TaskStatusFailed     = constant.TaskStatusFailed
+	TaskStatusCancelled  = constant.TaskStatusCancelled
+
+	PhaseStatusPending    = constant.PhaseStatusPending
+	PhaseStatusInProgress = constant.PhaseStatusInProgress
+	PhaseStatusComplete   = constant.PhaseStatusComplete
+	PhaseStatusFailed     = constant.PhaseStatusFailed
+
+	StorageTypeFile   = constant.StorageTypeFile
+	StorageTypeDB     = constant.StorageTypeDB
+	StorageTypeHybrid = constant.StorageTypeHybrid
+
+	ActionTypeView    = constant.ActionTypeView
+	ActionTypeBrowser = constant.ActionTypeBrowser
+	ActionTypeSearch  = constant.ActionTypeSearch
+	ActionTypeWrite   = constant.ActionTypeWrite
+	ActionTypeExecute = constant.ActionTypeExecute
 )
 
 // TaskPhase 任务阶段
@@ -150,60 +162,56 @@ type ContextCompression struct {
 
 // TaskManagerConfig 任务管理器配置
 type TaskManagerConfig struct {
-	StoragePath          string             `json:"storage_path"`           // 任务文件存储路径
-	RereadThreshold      int                `json:"reread_threshold"`       // 重读计划的工具调用阈值（默认10）
-	TwoActionRuleEnabled bool               `json:"two_action_rule"`        // 是否启用2动作规则
-	Compression          ContextCompression `json:"compression"`            // 上下文压缩配置
-	MaxRetries           int                `json:"max_retries"`            // 最大重试次数（3次打击规则）
-	EnableAutoPlanning   bool               `json:"enable_auto_planning"`   // 是否启用自动规划
+	// 存储配置
+	StorageType    StorageType `json:"storage_type"`     // 存储类型：file, db, hybrid
+	StoragePath    string      `json:"storage_path"`     // 文件存储路径
+	EnableFileSync bool        `json:"enable_file_sync"` // 混合模式下是否同步到文件
+
+	// 行为配置
+	RereadThreshold      int                `json:"reread_threshold"`     // 重读计划的工具调用阈值（默认10）
+	TwoActionRuleEnabled bool               `json:"two_action_rule"`      // 是否启用2动作规则
+	Compression          ContextCompression `json:"compression"`          // 上下文压缩配置
+	MaxRetries           int                `json:"max_retries"`          // 最大重试次数（3次打击规则）
+	EnableAutoPlanning   bool               `json:"enable_auto_planning"` // 是否启用自动规划
 }
 
 // DefaultTaskManagerConfig 返回默认配置
 func DefaultTaskManagerConfig() *TaskManagerConfig {
 	return &TaskManagerConfig{
-		StoragePath:          ".tasks",
-		RereadThreshold:      10,
+		StorageType:          StorageTypeFile, // 默认使用文件存储（符合 Manus 理念）
+		StoragePath:          constant.DefaultTaskStoragePath,
+		EnableFileSync:       true,
+		RereadThreshold:      constant.DefaultRereadThreshold,
 		TwoActionRuleEnabled: true,
 		Compression: ContextCompression{
-			MaxToolResultsInContext: 5,
+			MaxToolResultsInContext: constant.DefaultMaxToolResultsInContext,
 			CompressOlderResults:    true,
 			KeepReferencesOnly:      false,
 		},
-		MaxRetries:         3,
+		MaxRetries:         constant.DefaultMaxRetries,
 		EnableAutoPlanning: true,
 	}
 }
 
 // ToolCall 工具调用记录
 type ToolCall struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Args      map[string]interface{} `json:"args,omitempty"`
-	Result    string                 `json:"result,omitempty"`
-	Error     string                 `json:"error,omitempty"`
-	Timestamp time.Time              `json:"timestamp"`
-	Compressed bool                  `json:"compressed"` // 是否已压缩
+	ID         string                 `json:"id"`
+	Name       string                 `json:"name"`
+	Args       map[string]interface{} `json:"args,omitempty"`
+	Result     string                 `json:"result,omitempty"`
+	Error      string                 `json:"error,omitempty"`
+	Timestamp  time.Time              `json:"timestamp"`
+	Compressed bool                   `json:"compressed"` // 是否已压缩
 }
-
-// ActionType 动作类型（用于2动作规则）
-type ActionType string
-
-const (
-	ActionTypeView    ActionType = "view"    // 查看类操作
-	ActionTypeBrowser ActionType = "browser" // 浏览器操作
-	ActionTypeSearch  ActionType = "search"  // 搜索操作
-	ActionTypeWrite   ActionType = "write"   // 写入操作
-	ActionTypeExecute ActionType = "execute" // 执行操作
-)
 
 // PlanRequest 规划请求
 type PlanRequest struct {
 	UserID      string   `json:"user_id" binding:"required"`
 	SessionID   string   `json:"session_id" binding:"required"`
 	Goal        string   `json:"goal" binding:"required"`
-	Context     string   `json:"context,omitempty"`      // 额外上下文信息
-	Constraints []string `json:"constraints,omitempty"`  // 约束条件
-	Preferences []string `json:"preferences,omitempty"`  // 偏好设置
+	Context     string   `json:"context,omitempty"`     // 额外上下文信息
+	Constraints []string `json:"constraints,omitempty"` // 约束条件
+	Preferences []string `json:"preferences,omitempty"` // 偏好设置
 }
 
 // PlanResponse 规划响应
@@ -232,11 +240,11 @@ type ExecuteResponse struct {
 
 // TaskSummary 任务摘要（用于上下文压缩）
 type TaskSummary struct {
-	TaskID         string   `json:"task_id"`
-	Goal           string   `json:"goal"`
-	CurrentPhase   string   `json:"current_phase"`
+	TaskID          string   `json:"task_id"`
+	Goal            string   `json:"goal"`
+	CurrentPhase    string   `json:"current_phase"`
 	CompletedPhases []string `json:"completed_phases"`
-	KeyDecisions   []string `json:"key_decisions"`
-	RecentErrors   []string `json:"recent_errors"`
-	Summary        string   `json:"summary"`
+	KeyDecisions    []string `json:"key_decisions"`
+	RecentErrors    []string `json:"recent_errors"`
+	Summary         string   `json:"summary"`
 }

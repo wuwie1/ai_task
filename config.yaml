@@ -5,7 +5,7 @@ base:
     xorm.host: "127.0.0.1"
     xorm.username: "postgres"
     xorm.password: "123456"
-    xorm.name: "test_vector"
+    xorm.name: "ai_task"
     xorm.port: "5433"
     xorm.showsql: false
 # 网络请求

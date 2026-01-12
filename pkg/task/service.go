@@ -21,12 +21,12 @@ type Service struct {
 }
 
 // NewService 创建任务服务
-func NewService(config *TaskManagerConfig) (*Service, error) {
+func NewService(config *TaskManagerConfig, opts ...ManagerOption) (*Service, error) {
 	if config == nil {
 		config = DefaultTaskManagerConfig()
 	}
 
-	manager, err := NewManager(config)
+	manager, err := NewManager(config, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create task manager: %w", err)
 	}

@@ -74,3 +74,27 @@ func (f *Factory) NewUserProfileRepository(session interfaces.Session) (reposito
 	}
 	return nil, fmt.Errorf("xorm session 结构解析失败")
 }
+
+// NewTaskRepository 创建任务仓库
+func (f *Factory) NewTaskRepository(session interfaces.Session) (repository.TaskRepository, error) {
+	if s, ok := session.(*Session); ok {
+		return NewTaskRepository(s), nil
+	}
+	return nil, fmt.Errorf("xorm session 结构解析失败")
+}
+
+// NewTaskFindingsRepository 创建任务发现仓库
+func (f *Factory) NewTaskFindingsRepository(session interfaces.Session) (repository.TaskFindingsRepository, error) {
+	if s, ok := session.(*Session); ok {
+		return NewTaskFindingsRepository(s), nil
+	}
+	return nil, fmt.Errorf("xorm session 结构解析失败")
+}
+
+// NewTaskProgressRepository 创建任务进度仓库
+func (f *Factory) NewTaskProgressRepository(session interfaces.Session) (repository.TaskProgressRepository, error) {
+	if s, ok := session.(*Session); ok {
+		return NewTaskProgressRepository(s), nil
+	}
+	return nil, fmt.Errorf("xorm session 结构解析失败")
+}
