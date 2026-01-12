@@ -7,4 +7,5 @@ tmp/
 .vscode
 images/
 .idea/
+.tasks/
 bin/
