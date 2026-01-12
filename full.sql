@@ -1,0 +1,4 @@
+\set ON_ERROR_STOP on
+drop DATABASE IF EXISTS gat1400;
+create DATABASE gat1400;
+\c gat1400;

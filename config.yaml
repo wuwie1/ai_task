@@ -1,0 +1,64 @@
+base:
+  db:
+    repository.type: "xorm"
+    xorm.type: "postgres"
+    xorm.host: "127.0.0.1"
+    xorm.username: "postgres"
+    xorm.password: "123456"
+    xorm.name: "test_vector"
+    xorm.port: "5433"
+    xorm.showsql: false
+# 网络请求
+http:
+  request:
+    timeout.millisecond: 60000 # http请求超时,默认:60000
+app:
+  host: "0.0.0.0:4096" # 监听地址,必填项
+  log: # 日志
+    level: 5 # 日志等级   panic:0 fatal:1 error:2 warning:3 info:4 debug:5 trace:6
+    reportcaller: false # 是否打印日志所在代码行数，和方法
+    request: true #是开启日志
+
+
+clients:
+  http:
+    requestLog: true # 是否开启请求日志
+  embedding:
+    base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    model_name: "text-embedding-v2"
+  llmModel: # 调用模型
+    addr: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    #addr: "http://49.232.210.41:7777/v1"
+    model: "qwen3-max"
+    temperature: 0
+    maxTokens: 1500
+  redisClient:
+    host: "127.0.0.1:6380"
+    password: ""
+    db: 0
+
+# 记忆系统配置
+memory:
+  # 功能总开关
+  enable_session_memory: true    # 是否启用短期记忆，默认 true
+  enable_chunking: true          # 是否启用分块功能，默认 true
+  
+  # 短期记忆配置
+  session_memory_limit: 10      # 短期记忆条数，默认 10
+  semantic_memory_limit: 5      # 语义记忆条数，默认 5
+  semantic_threshold: 0.7       # 语义相似度阈值，默认 0.7
+  compress_threshold: 20        # 压缩阈值（超过此数量时压缩旧记忆），默认 20
+  
+  # 功能开关
+  enable_summary: false          # 是否启用摘要功能，默认 false
+  enable_auto_extract: false     # 是否自动提取关键事实到长期记忆，默认 false
+  
+  # 分块配置
+  chunk_max_size: 1000           # 最大块大小（字符数），默认 1000
+  chunk_overlap: 100             # 重叠窗口大小（字符数），默认 100
+  chunk_min_size: 200           # 最小块大小（字符数），默认 200
+  chunk_strategy: "paragraph"    # 分块策略: "paragraph"（默认）、"sentence"、"fixed"
+
+
+
+
