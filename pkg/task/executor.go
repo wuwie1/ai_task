@@ -188,7 +188,7 @@ func (e *Executor) decideAndExecuteStep(ctx context.Context, taskCtx *TaskContex
 	messages := []openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: executorSystemPrompt,
+			Content: PromptExecutorSystem,
 		},
 		{
 			Role:    openai.ChatMessageRoleUser,
@@ -242,29 +242,7 @@ type StepDecision struct {
 	Findings  []Finding `json:"findings,omitempty"`
 }
 
-// 执行器系统提示词
-const executorSystemPrompt = `你是一个任务执行专家。你的职责是根据当前任务状态决定如何执行下一步。
-
-## 执行原则
-
-1. **决策前阅读**: 仔细阅读任务计划和当前状态
-2. **3次打击规则**: 如果一个方法失败3次，尝试不同的方法
-3. **永不重复失败**: 不要重复已知失败的操作
-4. **记录所有内容**: 记录发现、决策和错误
-
-## 输出格式
-
-请以 JSON 格式输出你的决策：
-{
-  "action": "执行的动作类型",
-  "message": "执行结果描述",
-  "rationale": "决策理由",
-  "findings": [
-    {"category": "research/technical/visual", "content": "发现内容", "source": "来源"}
-  ]
-}
-
-只输出 JSON。`
+// 提示词常量已移至 prompts.go
 
 // buildDecisionPrompt 构建决策提示
 func (e *Executor) buildDecisionPrompt(taskCtx *TaskContext, phase *TaskPhase, step *TaskStep) string {

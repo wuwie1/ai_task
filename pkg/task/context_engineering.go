@@ -167,23 +167,12 @@ func (cs *ContextSummarizer) SummarizeContext(ctx context.Context, taskCtx *Task
 	}
 
 	// 使用 LLM 生成摘要
-	summaryPrompt := fmt.Sprintf(`请将以下任务上下文压缩为简洁的摘要，保留关键信息：
-
-%s
-
-要求：
-1. 保留目标和当前状态
-2. 保留关键决策和理由
-3. 保留重要错误和解决方案
-4. 移除冗余细节
-5. 最多 %d 个字符
-
-只输出摘要内容。`, content, cs.config.SummaryMaxTokens)
+	summaryPrompt := fmt.Sprintf(PromptContextSummaryUserTemplate, content, cs.config.SummaryMaxTokens)
 
 	messages := []openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: "你是一个上下文压缩专家，帮助将长文本压缩为简洁的摘要，同时保留关键信息。",
+			Content: PromptContextSummarizerSystem,
 		},
 		{
 			Role:    openai.ChatMessageRoleUser,
@@ -298,15 +287,7 @@ type OptimizedContext struct {
 // buildStableSystemPrompt 构建稳定的系统提示
 // 用于 KV 缓存优化
 func (ce *ContextEngineer) buildStableSystemPrompt() string {
-	return `你是一个智能任务执行助手，遵循以下原则：
-
-1. **计划优先**: 始终根据任务计划行动
-2. **记录一切**: 记录所有发现、决策和错误
-3. **永不重复失败**: 避免重复已知的失败操作
-4. **2动作规则**: 每2次查看/搜索操作后保存发现
-5. **3次打击规则**: 同一错误3次后升级给用户
-
-你将接收任务上下文，请根据当前状态决定下一步行动。`
+	return PromptStableSystemPrefix
 }
 
 // buildDynamicSystemPrompt 构建动态系统提示
@@ -315,13 +296,7 @@ func (ce *ContextEngineer) buildDynamicSystemPrompt(taskCtx *TaskContext) string
 		return ce.buildStableSystemPrompt()
 	}
 
-	return fmt.Sprintf(`你是一个智能任务执行助手。
-
-当前任务: %s
-目标: %s
-状态: %s
-
-请根据任务计划执行下一步操作。`, taskCtx.Task.ID, taskCtx.Task.Goal, taskCtx.Task.Status)
+	return fmt.Sprintf(PromptDynamicSystemTemplate, taskCtx.Task.ID, taskCtx.Task.Goal, taskCtx.Task.Status)
 }
 
 // buildTaskContext 构建任务上下文
@@ -501,36 +476,7 @@ func (mac *MultiAgentCoordinator) DelegateTask(ctx context.Context, parentTaskID
 
 // getAgentSystemPrompt 获取代理系统提示
 func (mac *MultiAgentCoordinator) getAgentSystemPrompt(role AgentRole) string {
-	prompts := map[AgentRole]string{
-		AgentRolePlanner: `你是任务规划专家。你的职责是：
-1. 分析任务需求
-2. 制定详细的执行计划
-3. 识别潜在风险和依赖
-输出 JSON 格式的计划。`,
-
-		AgentRoleExecutor: `你是任务执行专家。你的职责是：
-1. 按照计划执行任务
-2. 记录执行结果
-3. 报告任何问题
-输出 JSON 格式的执行结果。`,
-
-		AgentRoleReviewer: `你是质量审查专家。你的职责是：
-1. 检查任务完成质量
-2. 验证是否满足需求
-3. 提供改进建议
-输出 JSON 格式的审查结果。`,
-
-		AgentRoleResearcher: `你是研究专家。你的职责是：
-1. 收集相关信息
-2. 分析和总结发现
-3. 提供研究报告
-输出 JSON 格式的研究结果。`,
-	}
-
-	if prompt, ok := prompts[role]; ok {
-		return prompt
-	}
-	return "你是一个任务助手。"
+	return GetAgentPrompt(role)
 }
 
 // buildAgentPrompt 构建代理提示
@@ -650,21 +596,7 @@ func NewKVCacheOptimizer() *KVCacheOptimizer {
 // buildStablePrefix 构建稳定前缀
 func buildStablePrefix() string {
 	// 这个前缀应该保持稳定，不包含时间戳等变化内容
-	return `你是一个智能任务助手，遵循以下核心原则：
-
-## 核心原则
-1. 计划优先：始终根据任务计划行动
-2. 记录一切：记录所有发现、决策和错误  
-3. 永不重复失败：避免重复已知的失败操作
-4. 2动作规则：每2次查看/搜索操作后保存发现
-5. 3次打击规则：同一错误3次后升级给用户
-
-## 工作模式
-- 文件系统作为外部记忆（持久化）
-- 上下文窗口作为工作记忆（临时）
-- 重要信息必须写入文件
-
-`
+	return PromptKVCacheStablePrefix
 }
 
 // BuildOptimizedMessages 构建优化的消息

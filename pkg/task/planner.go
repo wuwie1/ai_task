@@ -24,46 +24,7 @@ func NewPlanner() *Planner {
 	}
 }
 
-// 规划系统提示词
-const plannerSystemPrompt = `你是一个任务规划专家。你的职责是将用户的目标分解为清晰、可执行的阶段和步骤。
-
-## 规划原则
-
-1. **MECE原则**: 阶段之间应该相互独立、完全穷尽
-2. **渐进式**: 从理解需求到交付，按逻辑顺序排列
-3. **可验证**: 每个步骤都应该有明确的完成标准
-4. **实际可行**: 步骤应该是具体的、可操作的
-
-## 标准阶段模板
-
-对于大多数任务，建议包含以下阶段：
-1. **需求与发现**: 理解需求、收集信息
-2. **规划与设计**: 确定技术方案、架构设计
-3. **实现**: 编码、构建
-4. **测试与验证**: 测试功能、验证需求
-5. **交付**: 文档、清理、交付
-
-## 输出格式
-
-请以 JSON 格式输出规划结果，格式如下：
-{
-  "phases": [
-    {
-      "id": "phase_1",
-      "name": "阶段名称",
-      "description": "阶段描述",
-      "steps": [
-        {"id": "step_1_1", "description": "步骤描述"},
-        {"id": "step_1_2", "description": "步骤描述"}
-      ]
-    }
-  ],
-  "key_questions": ["需要回答的关键问题1", "关键问题2"],
-  "estimate": "预估完成时间",
-  "risks": ["潜在风险1", "风险2"]
-}
-
-只输出 JSON，不要包含其他内容。`
+// 提示词常量已移至 prompts.go
 
 // PlannerResult 规划结果
 type PlannerResult struct {
@@ -107,7 +68,7 @@ func (p *Planner) GeneratePlan(ctx context.Context, req *PlanRequest) (*PlannerR
 	messages := []openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: plannerSystemPrompt,
+			Content: PromptPlannerSystem,
 		},
 		{
 			Role:    openai.ChatMessageRoleUser,
@@ -255,27 +216,13 @@ func (p *Planner) RefinePhase(ctx context.Context, taskContext *TaskContext, pha
 		return nil, fmt.Errorf("phase not found: %s", phaseID)
 	}
 
-	refinePrompt := fmt.Sprintf(`请为以下阶段生成更详细的执行步骤：
-
-任务目标: %s
-阶段名称: %s
-阶段描述: %s
-
-当前步骤:
-%s
-
-请生成更详细、更具体的步骤列表。输出 JSON 格式：
-{
-  "steps": [
-    {"id": "step_x_1", "description": "详细步骤描述"}
-  ]
-}
-只输出 JSON。`, taskContext.Task.Goal, targetPhase.Name, targetPhase.Description, formatSteps(targetPhase.Steps))
+	refinePrompt := fmt.Sprintf(PromptRefinePhaseUserTemplate,
+		taskContext.Task.Goal, targetPhase.Name, targetPhase.Description, formatSteps(targetPhase.Steps))
 
 	messages := []openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: "你是一个任务细化专家，帮助将粗略的步骤分解为更详细、可执行的小步骤。",
+			Content: PromptRefinePhaseSystem,
 		},
 		{
 			Role:    openai.ChatMessageRoleUser,

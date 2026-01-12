@@ -13,7 +13,7 @@ http:
   request:
     timeout.millisecond: 60000 # http请求超时,默认:60000
 app:
-  host: "0.0.0.0:4096" # 监听地址,必填项
+  host: "0.0.0.0:8080" # 监听地址,必填项
   log: # 日志
     level: 5 # 日志等级   panic:0 fatal:1 error:2 warning:3 info:4 debug:5 trace:6
     reportcaller: false # 是否打印日志所在代码行数，和方法
